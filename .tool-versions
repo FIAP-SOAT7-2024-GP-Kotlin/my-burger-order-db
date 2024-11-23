@@ -1,0 +1,3 @@
+liquibase 4.29.2
+java temurin-21.0.4+7.0.LTS
+gradle 8.10.1

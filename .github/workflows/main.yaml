@@ -1,0 +1,39 @@
+name: Deploy db
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: jdbc:postgresql://myburger-db-server-do-user-17490961-0.l.db.ondigitalocean.com:25060/my_burger
+      DATABASE_USER: doadmin
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up DigitalOcean
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN_ACCESS }}
+
+      - name: Get userpassword
+        run: |
+          DB_ID=$(doctl databases list --format ID --no-header)
+          DB_PASS=$(doctl databases user get $DB_ID doadmin --format Password --no-header)
+          echo "DB_PASS=$DB_PASS" >> $GITHUB_ENV
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: run gradle
+        env:
+          DATABASE_PASSWORD: ${{ env.DB_PASS }}
+        run: |
+          sed 's/#DB_PASS#/'"$DATABASE_PASSWORD"'/g' -i .env
+          ./gradlew --no-daemon update
