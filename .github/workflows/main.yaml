@@ -22,10 +22,9 @@ jobs:
       - name: Retrieve database URI and user's password
         run: |
           MONGO_DB_ID=$(doctl db list | grep mongo | awk '{print $1}')
-          DB_URI=$(doctl db connection $MONGO_DB_ID --format URI --no-header)
-          echo $DB_URI
-          DB_URI_UPDATED=$(echo "$DB_URI" | sed 's|mongodb+srv://|mongodb://|')
-          echo "UPDATED URI $DB_URI_UPDATED"
+          RAW_DB_URI=$(doctl db connection $MONGO_DB_ID --format URI --no-header)
+          echo $RAW_DB_URI
+          DB_URI=$(echo "$RAW_DB_URI" | sed 's|mongodb+srv://|mongodb://|')
           echo "DB_URI=$DB_URI" >> $GITHUB_ENV
           DB_PASS=$(doctl databases user get $MONGO_DB_ID doadmin --format Password --no-header)
           echo "DB_PASS=$DB_PASS" >> $GITHUB_ENV
