@@ -25,7 +25,7 @@ jobs:
           DB_URI=$(doctl db connection $MONGO_DB_ID --format URI --no-header)
           echo $DB_URI
           DB_URI_UPDATED=$(echo "$DB_URI" | sed 's|mongodb+srv://|mongodb://|')
-          echo $DB_URI_UPDATED
+          echo "UPDATED URI $DB_URI_UPDATED"
           echo "DB_URI=$DB_URI" >> $GITHUB_ENV
           DB_PASS=$(doctl databases user get $MONGO_DB_ID doadmin --format Password --no-header)
           echo "DB_PASS=$DB_PASS" >> $GITHUB_ENV
