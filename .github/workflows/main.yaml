@@ -36,7 +36,6 @@ jobs:
       - name: run gradle
         env:
           DATABASE_URL: ${{ env.DB_URI }}
-          DATABASE_PASSWORD: ${{ env.DB_PASS }}
         run: |
           sed 's/#DB_PASS#/'"$DATABASE_PASSWORD"'/g' -i .env
           ./gradlew --no-daemon update
