@@ -35,10 +35,13 @@ jobs:
           distribution: 'temurin'
           java-version: '21'
 
-      - name: run gradle
+      - name: Replace db uri
         env:
           DATABASE_URL: ${{ env.DB_URI }}
         run: |
-          sed 's/#DB_PASS#/'"$DATABASE_PASSWORD"'/g' -i .env
           sed 's/#DB_URI#/'"$DATABASE_URL"'/g' -i .env
+
+      - name: run gradle
+        run: |
+          sed 's/#DB_PASS#/'"$DB_PASS"'/g' -i .env
           ./gradlew --no-daemon update
