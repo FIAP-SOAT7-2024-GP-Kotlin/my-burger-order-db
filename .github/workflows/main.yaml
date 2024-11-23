@@ -7,7 +7,6 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
-      DATABASE_URL: jdbc:postgresql://myburger-db-server-do-user-17490961-0.l.db.ondigitalocean.com:25060/my_burger
       DATABASE_USER: doadmin
 
     steps:
@@ -18,6 +17,13 @@ jobs:
         uses: digitalocean/action-doctl@v2
         with:
           token: ${{ secrets.DO_TOKEN_ACCESS }}
+
+
+      - name: Retrieve database URI
+        run: |
+          MONGO_DB_ID=$(doctl db list | grep mongo | awk '{print $1}')
+          DB_URI=$(doctl db connection $MONGO_DB_ID --format URI --no-header)
+          echo "DB_URI=$DB_URI" >> $GITHUB_ENV
 
       - name: Get userpassword
         run: |
@@ -33,6 +39,7 @@ jobs:
 
       - name: run gradle
         env:
+          DATABASE_URL: ${{ env.DB_URI }}
           DATABASE_PASSWORD: ${{ env.DB_PASS }}
         run: |
           sed 's/#DB_PASS#/'"$DATABASE_PASSWORD"'/g' -i .env
