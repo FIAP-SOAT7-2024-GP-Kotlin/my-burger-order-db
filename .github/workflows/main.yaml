@@ -1,0 +1,46 @@
+name: Deploy db
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      DATABASE_USER: doadmin
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up DigitalOcean
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.DO_TOKEN_ACCESS }}
+
+
+      - name: Retrieve database URI
+        run: |
+          MONGO_DB_ID=$(doctl db list | grep mongo | awk '{print $1}')
+          DB_URI=$(doctl db connection $MONGO_DB_ID --format URI --no-header)
+          echo "DB_URI=$DB_URI" >> $GITHUB_ENV
+
+      - name: Get userpassword
+        run: |
+          DB_ID=$(doctl databases list --format ID --no-header)
+          DB_PASS=$(doctl databases user get $DB_ID doadmin --format Password --no-header)
+          echo "DB_PASS=$DB_PASS" >> $GITHUB_ENV
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: run gradle
+        env:
+          DATABASE_URL: ${{ env.DB_URI }}
+          DATABASE_PASSWORD: ${{ env.DB_PASS }}
+        run: |
+          sed 's/#DB_PASS#/'"$DATABASE_PASSWORD"'/g' -i .env
+          ./gradlew --no-daemon update
