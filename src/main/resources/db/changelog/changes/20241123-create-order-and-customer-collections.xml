@@ -8,8 +8,14 @@
          http://www.liquibase.org/xml/ns/mongodb
          http://www.liquibase.org/xml/ns/mongodb/liquibase-mongodb-latest.xsd">
 
-    <changeSet id="1" author="luizfernando.calazans8@gmail.com" labels="createCollectionLabel" context="createCollectionContext">
+    <changeSet id="1" author="luizfernando.calazans8@gmail.com" labels="createCollectionLabel"
+               context="createCollectionContext">
         <comment>create_collection_comment</comment>
+        <mongodb:runCommand>
+            <mongodb:command>
+                { use my-burger-order }
+            </mongodb:command>
+        </mongodb:runCommand>
         <mongodb:createCollection collectionName="order"/>
         <mongodb:createCollection collectionName="customer"/>
     </changeSet>
