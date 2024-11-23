@@ -39,6 +39,5 @@ jobs:
         env:
           DATABASE_URL: ${{ env.DB_URI }}
         run: |
-          sed 's/#DB_PASS#/'"$DATABASE_PASSWORD"'/g' -i .env
-          sed 's/#DB_URI#/'"$DATABASE_URL"'/g' -i .env          
+          sed 's/#DB_URI#/'"$DATABASE_URL"'/g' -i .env
           ./gradlew --no-daemon update
